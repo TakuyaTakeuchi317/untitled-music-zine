@@ -40,30 +40,32 @@ function parsePick(p: CollectionEntry<'issues'>) {
 <BaseLayout>
 
   <!-- ═══════════════════════════════════════════
-       MASTHEAD — black / white / yellow only
+       MASTHEAD — logo centred, neon-yellow tint
   ═══════════════════════════════════════════ -->
   <section class="border-b border-zinc-900">
-    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pt-8 pb-8 lg:pt-12 lg:pb-14
-                flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-6">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pt-10 pb-10 lg:pt-16 lg:pb-16
+                flex flex-col items-center gap-6">
 
-      <div>
-        <!-- Yellow label -->
-        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
-          Monthly Music Picks
-        </p>
-        <!-- SPEAKEASY white / PODCAST yellow -->
-        <h1 class="font-impact font-black uppercase leading-[0.80] tracking-wide"
-          style="font-size: clamp(40px, 8vw, 120px);">
-          <span class="text-white">SPEAKEASY</span><br /><span class="text-accent">PODCAST</span>
-        </h1>
-        <!-- Subdued tagline, no color accent -->
-        <p class="mt-5 font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-600">
-          MONTHLY SELECTION — NO ALGORITHM
-        </p>
-      </div>
+      <!-- Logo image — white PNG tinted neon-yellow via CSS filter -->
+      <h1 class="w-full flex justify-center">
+        <img
+          src="/image_4.png"
+          alt="SPEAKEASY PODCAST"
+          class="masthead-logo block"
+          style="
+            width: clamp(260px, 70vw, 900px);
+            max-width: 100%;
+            height: auto;
+            filter:
+              brightness(0) saturate(100%)
+              invert(93%) sepia(61%) saturate(700%) hue-rotate(5deg) brightness(103%) contrast(103%);
+          "
+        />
+      </h1>
 
-      <p class="text-zinc-600 text-sm leading-relaxed lg:max-w-[220px] lg:text-right">
-        Every month, curated sounds.<br />No algorithm.
+      <!-- Subdued tagline -->
+      <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-600">
+        MONTHLY SELECTION — NO ALGORITHM
       </p>
 
     </div>
