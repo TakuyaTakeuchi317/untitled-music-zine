@@ -1,0 +1,101 @@
+---
+interface Props {
+  slug: string;
+  issueNumber: number;
+  title: string;
+  date: Date;
+  theme: string;
+  description: string;
+  coverColor: string;
+  coverAccent: string;
+}
+
+const { slug, issueNumber, title, date, theme, description, coverColor, coverAccent } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+});
+
+const issueLabel = String(issueNumber).padStart(3, '0');
+---
+
+<a
+  href={`/issues/${slug}`}
+  class="group block relative overflow-hidden border border-stone-200 hover:border-stone-400 transition-colors duration-300 bg-stone-50"
+>
+  <!-- Cover block: abstract typography art -->
+  <div
+    class="relative overflow-hidden"
+    style={`background-color: ${coverColor}; aspect-ratio: 4/3;`}
+  >
+    <!-- Giant background issue number -->
+    <span
+      class="absolute -bottom-4 -right-4 font-mono font-bold leading-none select-none pointer-events-none"
+      style={`font-size: clamp(80px, 18vw, 160px); color: ${coverAccent}; opacity: 0.18; letter-spacing: -0.04em;`}
+      aria-hidden="true"
+    >
+      {issueLabel}
+    </span>
+
+    <!-- Thin vertical accent line -->
+    <div
+      class="absolute left-7 top-7 bottom-7 w-px opacity-30"
+      style={`background-color: ${coverAccent};`}
+    ></div>
+
+    <!-- Theme label vertical -->
+    <div class="absolute left-5 top-7 bottom-7 flex items-center">
+      <span
+        class="writing-vertical font-mono text-[9px] uppercase tracking-[0.25em] opacity-50"
+        style={`color: ${coverAccent};`}
+      >
+        {theme}
+      </span>
+    </div>
+
+    <!-- Issue number top-right -->
+    <div class="absolute top-6 right-6">
+      <span
+        class="font-mono text-[10px] uppercase tracking-[0.2em] opacity-60"
+        style={`color: ${coverAccent};`}
+      >
+        No.{issueLabel}
+      </span>
+    </div>
+
+    <!-- Subtle noise overlay -->
+    <div
+      class="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+      style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E&quot;);"
+    ></div>
+
+    <!-- Hover overlay -->
+    <div class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-stone-50"></div>
+  </div>
+
+  <!-- Card info -->
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-3">
+      <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-stone-400">
+        {formattedDate}
+      </span>
+      <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-olive-500 border border-olive-200 px-2 py-0.5">
+        {theme}
+      </span>
+    </div>
+
+    <h3 class="font-display text-xl font-bold text-stone-950 leading-snug mb-2 group-hover:text-olive-600 transition-colors duration-200">
+      {title}
+    </h3>
+
+    <p class="text-stone-500 text-sm leading-relaxed line-clamp-2">
+      {description}
+    </p>
+
+    <div class="mt-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-stone-400 group-hover:text-olive-500 transition-colors duration-200">
+      <span>Read Issue</span>
+      <span class="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+    </div>
+  </div>
+</a>

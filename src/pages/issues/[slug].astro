@@ -1,0 +1,257 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const issues = await getCollection('issues', ({ data }) => !data.draft);
+  return issues.map((issue) => ({
+    params: { slug: issue.slug },
+    props: { issue },
+  }));
+}
+
+const { issue } = Astro.props as { issue: CollectionEntry<'issues'> };
+
+const { title, trackName, artist, issueNumber, date, theme,
+        description, coverImage, spotifyEmbedUrl, tags } = issue.data;
+
+const track      = trackName ?? title.split(' / ')[0] ?? title;
+const artistName = artist    ?? title.split(' / ')[1] ?? '';
+const numLabel   = String(issueNumber).padStart(2, '0');
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+
+const allIssues = (await getCollection('issues', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.issueNumber - b.data.issueNumber);  // asc
+
+const currentIndex = allIssues.findIndex((i) => i.slug === issue.slug);
+const prevIssue    = allIssues[currentIndex - 1] ?? null;
+const nextIssue    = allIssues[currentIndex + 1] ?? null;
+---
+
+<BaseLayout title={`${track} — ${artistName}`} description={description}>
+
+  <!-- ═══════════════════════════════════════════════
+       HEADER
+       Red = date / badge / artist   Yellow = number bar / lines
+  ═══════════════════════════════════════════════ -->
+  <header class="relative bg-zinc-950 border-b border-zinc-900 px-6 lg:px-12 pt-12 pb-16 overflow-hidden">
+
+    {/* Ghost number — very faint, decorative */}
+    <div aria-hidden="true"
+      class="absolute right-0 bottom-0 font-impact font-black leading-none
+             select-none pointer-events-none text-zinc-900"
+      style="font-size: clamp(160px, 35vw, 500px); line-height: 0.76;
+             transform: translate(5%, 20%); letter-spacing: -0.04em;">
+      {numLabel}
+    </div>
+
+    {/* Left rule — yellow */}
+    <div class="absolute top-0 bottom-0 left-[4.5rem] w-[2px] bg-accent opacity-20"></div>
+
+    <div class="max-w-screen-2xl mx-auto relative z-10">
+
+      {/* Breadcrumb — red on hover */}
+      <div class="flex items-center gap-3 mb-10">
+        <a href="/"
+          class="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700
+                 hover:text-nme transition-colors duration-150">
+          ← All Picks
+        </a>
+        <span class="text-zinc-800">/</span>
+        <span class="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700">
+          {numLabel}
+        </span>
+      </div>
+
+      {/* Two-col: typography left, jacket right */}
+      <div class="flex flex-col lg:flex-row lg:items-start gap-10 lg:gap-16">
+
+        {/* Left: typography */}
+        <div class="flex-1">
+
+          {/* Meta badges — red is the date/label color */}
+          <div class="flex flex-wrap items-center gap-3 mb-6">
+            <span class="bg-nme text-white font-mono text-[9px] uppercase tracking-[0.25em] px-3 py-1.5 font-bold">
+              Pick {numLabel}
+            </span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-nme">
+              {formattedDate}
+            </span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600
+                         border border-zinc-800 px-2 py-0.5">
+              {theme}
+            </span>
+          </div>
+
+          {/* Track title — white */}
+          <h1 class="font-impact font-black uppercase text-white leading-[0.84] tracking-[-0.01em]"
+            style="font-size: clamp(52px, 9vw, 120px);">
+            {track}
+          </h1>
+
+          {/* Artist — red (date-like, secondary label) */}
+          <p class="font-impact font-bold uppercase text-nme mt-2 leading-none"
+            style="font-size: clamp(28px, 4vw, 54px); letter-spacing: -0.01em;">
+            {artistName}
+          </p>
+
+          <p class="mt-7 text-zinc-500 text-base leading-relaxed max-w-lg">{description}</p>
+
+          {tags && tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mt-6">
+              {tags.map((tag) => (
+                <span class="font-mono text-[9px] uppercase tracking-[0.18em]
+                             text-zinc-700 border border-zinc-900 px-2.5 py-1">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right: jacket — contained, never stretched */}
+        {coverImage && (
+          <div class="flex-shrink-0">
+            <div class="jacket w-[240px] sm:w-[300px] lg:w-[280px] xl:w-[320px]
+                        border border-zinc-800 shadow-2xl shadow-black">
+              <img src={coverImage} alt={`${track} — ${artistName}`} width="320" height="320" />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* Bottom — yellow accent line */}
+    <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-accent opacity-30"></div>
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONTENT — player + meta
+  ═══════════════════════════════════════════════ -->
+  <div class="bg-zinc-950 border-t border-zinc-900">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-16">
+
+      {/* Number bar — decorative */}
+      <div class="flex items-center gap-6 mb-12">
+        <span aria-hidden="true"
+          class="font-impact font-black text-zinc-900 leading-none select-none"
+          style="font-size: clamp(72px, 14vw, 140px); letter-spacing: -0.04em; line-height: 0.8;">
+          {numLabel}
+        </span>
+        <div class="flex-1 h-[3px] bg-accent opacity-50"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10 xl:gap-16 items-start">
+
+        {/* Spotify player — dominant */}
+        {spotifyEmbedUrl && (
+          <div class="border border-zinc-800">
+            <iframe
+              src={spotifyEmbedUrl.includes('/embed/')
+                ? spotifyEmbedUrl
+                : spotifyEmbedUrl.replace('https://open.spotify.com/', 'https://open.spotify.com/embed/')}
+              width="100%"
+              height="352"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title={`${track} — ${artistName}`}
+            ></iframe>
+          </div>
+        )}
+
+        {/* Meta + Newsletter */}
+        <aside class="lg:sticky lg:top-24 space-y-5">
+
+          <div class="border border-zinc-800 p-5 bg-zinc-950">
+            <dl class="space-y-3">
+              <div>
+                <dt class="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-700 mb-0.5">Pick</dt>
+                <dd class="font-impact font-bold uppercase text-accent text-2xl">No.{numLabel}</dd>
+              </div>
+              <div>
+                <dt class="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-700 mb-0.5">Date</dt>
+                <dd class="font-mono text-sm text-nme">{formattedDate}</dd>
+              </div>
+              <div>
+                <dt class="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-700 mb-0.5">Genre</dt>
+                <dd class="text-sm text-zinc-500">{theme}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="border border-zinc-800 p-5 bg-zinc-950">
+            <p class="font-impact font-black uppercase text-white text-2xl leading-none mb-2">
+              Get Every Pick.
+            </p>
+            <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+              3 tracks. Monthly. In your inbox.
+            </p>
+            <a href="https://signal.substack.com" target="_blank" rel="noopener noreferrer"
+              class="group flex items-center justify-between
+                     font-impact font-bold uppercase tracking-[0.1em] text-lg
+                     bg-accent text-zinc-950 px-4 py-3
+                     hover:bg-nme hover:text-white
+                     transition-colors duration-150">
+              Subscribe ↗
+            </a>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PREV / NEXT — red hover
+  ═══════════════════════════════════════════════ -->
+  <nav class="border-t border-zinc-900 bg-zinc-950">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12">
+      <div class="grid grid-cols-2 divide-x divide-zinc-900">
+
+        {prevIssue ? (
+          <a href={`/issues/${prevIssue.slug}`}
+            class="group py-8 pr-8 flex flex-col gap-1.5 hover:bg-zinc-900 transition-colors duration-150">
+            <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-700
+                         group-hover:text-nme transition-colors">
+              ← Previous
+            </span>
+            <span class="font-impact font-bold uppercase text-zinc-500 leading-none
+                         group-hover:text-white transition-colors"
+              style="font-size: clamp(18px, 2.5vw, 28px);">
+              {prevIssue.data.trackName ?? prevIssue.data.title.split(' / ')[0]}
+            </span>
+            <span class="font-mono text-[10px] text-zinc-700">
+              {prevIssue.data.artist ?? prevIssue.data.title.split(' / ')[1]}
+            </span>
+          </a>
+        ) : <div></div>}
+
+        {nextIssue ? (
+          <a href={`/issues/${nextIssue.slug}`}
+            class="group py-8 pl-8 flex flex-col gap-1.5 items-end text-right
+                   hover:bg-zinc-900 transition-colors duration-150">
+            <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-700
+                         group-hover:text-nme transition-colors">
+              Next →
+            </span>
+            <span class="font-impact font-bold uppercase text-zinc-500 leading-none
+                         group-hover:text-white transition-colors"
+              style="font-size: clamp(18px, 2.5vw, 28px);">
+              {nextIssue.data.trackName ?? nextIssue.data.title.split(' / ')[0]}
+            </span>
+            <span class="font-mono text-[10px] text-zinc-700">
+              {nextIssue.data.artist ?? nextIssue.data.title.split(' / ')[1]}
+            </span>
+          </a>
+        ) : <div></div>}
+
+      </div>
+    </div>
+  </nav>
+
+</BaseLayout>

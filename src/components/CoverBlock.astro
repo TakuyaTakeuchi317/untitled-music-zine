@@ -1,0 +1,67 @@
+---
+interface Props {
+  num: string;
+  theme: string;
+  coverImage?: string;
+  title?: string;
+  /** visual style */
+  variant?: 'accent' | 'dark';
+}
+const { num, theme, coverImage, title, variant = 'dark' } = Astro.props;
+const isAccent = variant === 'accent';
+---
+
+<div class="relative overflow-hidden h-full bg-ink-soft">
+
+  {/* Photo */}
+  {coverImage && (
+    <img
+      src={coverImage}
+      alt={title ?? theme}
+      class="absolute inset-0 w-full h-full object-cover object-center"
+      loading="lazy"
+    />
+  )}
+
+  {/* Overlay */}
+  <div class={`absolute inset-0 ${
+    coverImage
+      ? 'bg-ink/60'
+      : isAccent
+        ? 'bg-accent'
+        : 'bg-ink-mid'
+  }`}></div>
+
+  {/* Giant ghost number */}
+  <span
+    aria-hidden="true"
+    class={`absolute bottom-0 right-0 font-impact font-black leading-none
+            select-none pointer-events-none z-10
+            ${coverImage ? 'text-white' : isAccent ? 'text-ink' : 'text-accent'}`}
+    style="font-size: clamp(100px, 20vw, 280px); line-height: 0.78;
+           transform: translate(8%, 14%); letter-spacing: -0.04em; opacity: 0.2;"
+  >
+    {num}
+  </span>
+
+  {/* Theme label */}
+  <div class="absolute top-7 left-5 bottom-7 flex items-center z-20">
+    <span class={`writing-vertical font-mono text-[9px] uppercase tracking-[0.28em] opacity-50
+                  ${isAccent && !coverImage ? 'text-ink' : 'text-white'}`}>
+      {theme}
+    </span>
+  </div>
+
+  {/* Number top-right */}
+  <div class="absolute top-7 right-7 z-20">
+    <span class={`font-mono text-[10px] uppercase tracking-[0.22em] opacity-60
+                  ${isAccent && !coverImage ? 'text-ink' : 'text-accent'}`}>
+      {num}
+    </span>
+  </div>
+
+  {/* Left accent line */}
+  <div class={`absolute top-0 bottom-0 left-8 w-[2px] opacity-20 z-20
+               ${isAccent && !coverImage ? 'bg-ink' : 'bg-accent'}`}></div>
+
+</div>

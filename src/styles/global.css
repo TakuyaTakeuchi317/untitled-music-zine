@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body { @apply font-sans text-white bg-zinc-950; }
+  ::selection { background: #E2FF00; color: #0a0a0a; }
+}
+
+@layer components {
+  .nav-link {
+    @apply relative font-mono text-[11px] uppercase tracking-[0.18em]
+           text-zinc-500 transition-colors duration-150 hover:text-accent;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-0.5 left-0 w-0 h-[2px] bg-accent transition-all duration-200;
+  }
+  .nav-link:hover::after { @apply w-full; }
+
+  /* Record jacket */
+  .jacket { @apply aspect-square w-full overflow-hidden bg-zinc-900; }
+  .jacket img { @apply w-full h-full object-cover; }
+
+  .spotify-wrapper iframe { @apply w-full border-0; }
+}
+
+@layer utilities {
+  .writing-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+}

@@ -1,0 +1,45 @@
+---
+const year = new Date().getFullYear();
+const substackUrl = 'https://signal.substack.com';
+---
+
+<footer class="bg-zinc-950 border-t border-zinc-900">
+  <div class="h-[2px] bg-accent"></div>
+
+  <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-20">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-4">
+          Newsletter
+        </p>
+        <h2 class="font-impact font-black uppercase text-white leading-[0.86]"
+          style="font-size: clamp(44px, 7vw, 96px); letter-spacing: -0.02em;">
+          Get Every<br />Pick.
+        </h2>
+        <p class="mt-4 text-zinc-600 text-sm leading-relaxed max-w-xs">
+          3 tracks. Monthly. In your inbox.
+        </p>
+      </div>
+
+      <a href={substackUrl} target="_blank" rel="noopener noreferrer"
+        class="group flex-shrink-0 inline-flex items-center gap-3
+               font-impact font-bold uppercase tracking-[0.1em] text-xl
+               bg-accent text-zinc-950 px-10 py-5
+               hover:bg-white hover:text-zinc-950
+               transition-colors duration-150">
+        Subscribe on Substack
+        <span class="transition-transform duration-150 group-hover:translate-x-1.5">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-900">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
+      <span class="font-mono text-[10px] uppercase tracking-[0.35em] text-zinc-700">
+        UNTITLED © {year}
+      </span>
+      <a href={substackUrl} target="_blank" rel="noopener noreferrer"
+        class="nav-link">Substack ↗</a>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,28 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-zinc-950 border-b border-zinc-900">
+  <!-- Yellow top strip — only 2px, tasteful -->
+  <div class="absolute top-0 left-0 right-0 h-[2px] bg-accent"></div>
+
+  <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 h-14 flex items-center justify-between">
+    <a href="/"
+      class="font-mono text-sm uppercase tracking-[0.4em]
+             text-white hover:text-accent transition-colors duration-150">
+      UNTITLED
+    </a>
+    <nav class="flex items-center gap-8">
+      <a href="/"
+        class:list={['nav-link', { 'text-accent': currentPath === '/' }]}>
+        Picks
+      </a>
+      <a href="https://signal.substack.com" target="_blank" rel="noopener noreferrer"
+        class="nav-link">
+        Subscribe ↗
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="h-14" aria-hidden="true"></div>

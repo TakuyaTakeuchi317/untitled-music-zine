@@ -1,0 +1,206 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+// ── Fetch & group by month ───────────────────────────────────
+const all = await getCollection('issues', ({ data }) => !data.draft);
+
+type MonthGroup = {
+  sortKey: string;
+  month:   string;
+  year:    string;
+  picks:   CollectionEntry<'issues'>[];
+};
+
+const monthMap = new Map<string, MonthGroup>();
+for (const pick of all) {
+  const d    = pick.data.date;
+  const key  = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const month = d.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+  const year  = String(d.getFullYear());
+  if (!monthMap.has(key)) monthMap.set(key, { sortKey: key, month, year, picks: [] });
+  monthMap.get(key)!.picks.push(pick);
+}
+
+// Sort picks within each month by issueNumber asc
+for (const g of monthMap.values()) {
+  g.picks.sort((a, b) => a.data.issueNumber - b.data.issueNumber);
+}
+
+const months = [...monthMap.values()].sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+
+function pad(n: number) { return String(n).padStart(2, '0'); }
+function parsePick(p: CollectionEntry<'issues'>) {
+  const track  = p.data.trackName ?? p.data.title.split(' / ')[0] ?? p.data.title;
+  const artist = p.data.artist    ?? p.data.title.split(' / ')[1] ?? '';
+  return { track, artist };
+}
+---
+
+<BaseLayout>
+
+  <!-- ═══════════════════════════════════════════
+       MASTHEAD — black / white / yellow only
+  ═══════════════════════════════════════════ -->
+  <section class="border-b border-zinc-900">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pt-12 pb-14
+                flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+
+      <div>
+        <!-- Yellow label -->
+        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
+          Monthly Music Picks
+        </p>
+        <!-- UNTITLED: UN white / TITLED yellow -->
+        <h1 class="font-impact font-black uppercase leading-[0.80] tracking-wide"
+          style="font-size: clamp(64px, 12vw, 160px);">
+          <span class="text-white">UN</span><span class="text-accent">TITLED</span>
+        </h1>
+        <!-- Subdued tagline, no color accent -->
+        <p class="mt-5 font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-600">
+          3 tracks — curated monthly — no algorithm
+        </p>
+      </div>
+
+      <p class="text-zinc-600 text-sm leading-relaxed lg:max-w-[220px] lg:text-right">
+        Every month, three tracks.<br />Liner notes. Just music.
+      </p>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       MONTHLY SECTIONS
+  ═══════════════════════════════════════════ -->
+  {months.map((group, monthIndex) => (
+    <section class="border-b border-zinc-900">
+
+      {/* Month header */}
+      <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pt-14 pb-8">
+        <div class="flex items-baseline gap-5 mb-1">
+          <!-- Year: accent yellow -->
+          <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-accent">
+            {group.year}
+          </span>
+          <div class="flex-1 h-px bg-zinc-900"></div>
+          <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-700">
+            {group.picks.length} {group.picks.length === 1 ? 'track' : 'tracks'}
+          </span>
+        </div>
+
+        <!-- Month name: white (current) or zinc-600 (older) -->
+        <h2
+          class="font-impact font-black uppercase leading-none tracking-[-0.02em]"
+          style="font-size: clamp(52px, 10vw, 130px);"
+        >
+          <span class={monthIndex === 0 ? 'text-white' : 'text-zinc-600'}>
+            {group.month}
+          </span>
+        </h2>
+
+        <!-- Yellow short underline -->
+        <div class="mt-3 h-[2px] bg-accent w-14"></div>
+      </div>
+
+      {/* ── Track grid ── */}
+      <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-14">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+
+          {group.picks.map((pick, i) => {
+            const num = pad(i + 1);
+            const { track, artist } = parsePick(pick);
+
+            return (
+              <a
+                href={`/issues/${pick.slug}`}
+                class="group flex flex-col bg-zinc-950 border border-zinc-800
+                       hover:border-accent transition-colors duration-200 overflow-hidden"
+              >
+                {/* ── Jacket: top, full card width, no side padding ── */}
+                <div class="relative w-full overflow-hidden bg-zinc-900"
+                     style="aspect-ratio: 1 / 1;">
+
+                  {pick.data.coverImage ? (
+                    <img
+                      src={pick.data.coverImage}
+                      alt={`${track} by ${artist}`}
+                      class="w-full h-full object-cover
+                             group-hover:scale-[1.02] transition-transform duration-500"
+                      loading="lazy"
+                      width="640"
+                      height="640"
+                    />
+                  ) : (
+                    /* No-image placeholder */
+                    <div class="w-full h-full flex items-center justify-center bg-zinc-900">
+                      <span class="font-impact font-black text-zinc-800"
+                        style="font-size: 6rem;">{num}</span>
+                    </div>
+                  )}
+
+                  {/* Number overlay — bottom-left, yellow */}
+                  <div class="absolute bottom-0 left-0 p-3 leading-none">
+                    <span
+                      class="font-impact font-black text-accent"
+                      style="font-size: clamp(40px, 4.5vw, 64px); letter-spacing: -0.03em;
+                             text-shadow: 0 2px 12px rgba(0,0,0,0.8);"
+                    >
+                      {num}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ── Info block ── */}
+                <div class="flex flex-col flex-1 p-5 gap-0.5">
+
+                  {/* Track title */}
+                  <h3
+                    class="font-impact font-black uppercase text-white leading-none
+                           group-hover:text-accent transition-colors duration-150"
+                    style="font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.01em;"
+                  >
+                    {track}
+                  </h3>
+
+                  {/* Artist */}
+                  <p class="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500">
+                    {artist}
+                  </p>
+
+                  {/* Theme + CTA */}
+                  <div class="flex items-center justify-between mt-4 pt-4 border-t border-zinc-900">
+                    <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-700">
+                      {pick.data.theme}
+                    </span>
+                    <span class="font-mono text-[9px] uppercase tracking-[0.2em]
+                                 text-zinc-600 group-hover:text-accent transition-colors duration-150">
+                      Listen →
+                    </span>
+                  </div>
+                </div>
+
+              </a>
+            );
+          })}
+
+        </div>
+      </div>
+    </section>
+  ))}
+
+
+  <!-- ═══════════════════════════════════════════
+       TICKER — yellow bg, black Impact text
+  ═══════════════════════════════════════════ -->
+  <div class="overflow-hidden bg-accent py-3.5">
+    <div class="flex whitespace-nowrap animate-marquee select-none">
+      {[...Array(2)].map(() => (
+        <span class="font-impact font-bold uppercase text-zinc-950 text-lg tracking-[0.08em]">
+          Signal · Monthly Picks · Curated Selections · Electronic · Post-Punk · EBM · Liner Notes · Signal · Monthly Picks · Curated Selections ·&nbsp;&nbsp;&nbsp;
+        </span>
+      ))}
+    </div>
+  </div>
+
+</BaseLayout>

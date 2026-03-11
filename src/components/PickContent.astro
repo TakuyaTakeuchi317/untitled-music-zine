@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  pick: CollectionEntry<'issues'>;
+  num: string;
+  /** 'lg' = featured pick 01, 'sm' = picks 02 / 03 */
+  size: 'lg' | 'sm';
+}
+
+const { pick, num, size } = Astro.props;
+const isLg = size === 'lg';
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+const titleSize = isLg
+  ? 'clamp(42px, 6.5vw, 96px)'
+  : 'clamp(30px, 4vw, 60px)';
+---
+
+<div class={`relative flex flex-col justify-between bg-ink overflow-hidden
+             ${isLg ? 'px-8 lg:px-14 py-10' : 'px-6 py-8'} flex-1`}>
+
+  {/* Ghost number */}
+  <span
+    aria-hidden="true"
+    class="absolute right-0 bottom-0 font-impact font-black leading-none
+           select-none pointer-events-none text-ink-mid"
+    style={`font-size: clamp(110px, ${isLg ? '22vw' : '18vw'}, ${isLg ? '280px' : '200px'});
+            line-height: 0.78; transform: translate(10%, 14%); letter-spacing: -0.04em;`}
+  >
+    {num}
+  </span>
+
+  {/* Top row */}
+  <div class="relative z-10 flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <span class="font-mono text-[9px] uppercase tracking-[0.25em] bg-accent text-ink px-2.5 py-1">
+        Pick {num}
+      </span>
+      <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+        {fmtDate(pick.data.date)}
+      </span>
+    </div>
+    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-accent border border-accent/40 px-2 py-0.5">
+      {pick.data.theme}
+    </span>
+  </div>
+
+  {/* Title */}
+  <div class="relative z-10 my-4">
+    <h2
+      class="font-impact font-black uppercase text-white leading-[0.86] tracking-[-0.01em]"
+      style={`font-size: ${titleSize};`}
+    >
+      {pick.data.title}
+    </h2>
+  </div>
+
+  {/* Bottom: description + CTA */}
+  <div class="relative z-10 flex items-end justify-between gap-6">
+    <p class={`text-zinc-500 leading-relaxed ${isLg ? 'text-sm max-w-xs' : 'text-xs max-w-[200px]'}`}>
+      {pick.data.description}
+    </p>
+    <a
+      href={`/issues/${pick.slug}`}
+      class="group flex-shrink-0 inline-flex items-center gap-2
+             font-impact font-bold uppercase tracking-[0.1em]
+             bg-accent text-ink
+             hover:bg-white hover:text-ink
+             transition-colors duration-150
+             px-6 py-3 text-lg"
+    >
+      Listen
+      <span class="transition-transform duration-150 group-hover:translate-x-1">→</span>
+    </a>
+  </div>
+</div>
