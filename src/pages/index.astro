@@ -46,21 +46,12 @@ function parsePick(p: CollectionEntry<'issues'>) {
     <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 pt-10 pb-10 lg:pt-16 lg:pb-16
                 flex flex-col items-center gap-6">
 
-      <!-- Logo image — white PNG tinted neon-yellow via CSS filter -->
-      <h1 class="w-full flex justify-center">
-        <img
-          src="/image_4.png"
-          alt="SPEAKEASY PODCAST"
-          class="masthead-logo block"
-          style="
-            width: clamp(260px, 70vw, 900px);
-            max-width: 100%;
-            height: auto;
-            filter:
-              brightness(0) saturate(100%)
-              invert(93%) sepia(61%) saturate(700%) hue-rotate(5deg) brightness(103%) contrast(103%);
-          "
-        />
+      <!-- Title text -->
+      <h1
+        class="font-impact font-black uppercase text-accent leading-none tracking-[-0.03em]"
+        style="font-size: clamp(72px, 18vw, 220px);"
+      >
+        UNTITLED
       </h1>
 
       <!-- Subdued tagline -->
