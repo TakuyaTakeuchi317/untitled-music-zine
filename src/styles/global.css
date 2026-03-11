@@ -28,6 +28,16 @@
   .jacket img { @apply w-full h-full object-cover; }
 
   .spotify-wrapper iframe { @apply w-full border-0; }
+
+  /* Podcast embed — スマホで高さを縮小 */
+  .podcast-embed iframe {
+    height: 352px;
+  }
+  @media (max-width: 480px) {
+    .podcast-embed iframe {
+      height: 232px;
+    }
+  }
 }
 
 @layer utilities {
