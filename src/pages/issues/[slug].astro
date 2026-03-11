@@ -37,7 +37,7 @@ const nextIssue    = allIssues[currentIndex + 1] ?? null;
        HEADER
        Red = date / badge / artist   Yellow = number bar / lines
   ═══════════════════════════════════════════════ -->
-  <header class="relative bg-zinc-950 border-b border-zinc-900 px-6 lg:px-12 pt-12 pb-16 overflow-hidden">
+  <header class="relative bg-zinc-950 border-b border-zinc-900 px-6 lg:px-12 pt-8 pb-10 lg:pt-12 lg:pb-16 overflow-hidden">
 
     {/* Ghost number — very faint, decorative */}
     <div aria-hidden="true"
@@ -48,13 +48,13 @@ const nextIssue    = allIssues[currentIndex + 1] ?? null;
       {numLabel}
     </div>
 
-    {/* Left rule — yellow */}
-    <div class="absolute top-0 bottom-0 left-[4.5rem] w-[2px] bg-accent opacity-20"></div>
+    {/* Left rule — yellow, desktop only */}
+    <div class="hidden lg:block absolute top-0 bottom-0 left-[4.5rem] w-[2px] bg-accent opacity-20"></div>
 
     <div class="max-w-screen-2xl mx-auto relative z-10">
 
       {/* Breadcrumb — red on hover */}
-      <div class="flex items-center gap-3 mb-10">
+      <div class="flex items-center gap-3 mb-5 lg:mb-10">
         <a href="/"
           class="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700
                  hover:text-nme transition-colors duration-150">
@@ -98,8 +98,6 @@ const nextIssue    = allIssues[currentIndex + 1] ?? null;
             {artistName}
           </p>
 
-          <p class="mt-7 text-zinc-500 text-base leading-relaxed max-w-lg">{description}</p>
-
           {tags && tags.length > 0 && (
             <div class="flex flex-wrap gap-2 mt-6">
               {tags.map((tag) => (
@@ -115,7 +113,7 @@ const nextIssue    = allIssues[currentIndex + 1] ?? null;
         {/* Right: jacket — contained, never stretched */}
         {coverImage && (
           <div class="flex-shrink-0">
-            <div class="jacket w-[240px] sm:w-[300px] lg:w-[280px] xl:w-[320px]
+            <div class="jacket w-full lg:w-[280px] xl:w-[320px]
                         border border-zinc-800 shadow-2xl shadow-black">
               <img src={coverImage} alt={`${track} — ${artistName}`} width="320" height="320" />
             </div>
@@ -133,16 +131,16 @@ const nextIssue    = allIssues[currentIndex + 1] ?? null;
        CONTENT — player + meta
   ═══════════════════════════════════════════════ -->
   <div class="bg-zinc-950 border-t border-zinc-900">
-    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-16">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-8 lg:py-16">
 
       {/* Number bar — decorative */}
-      <div class="flex items-center gap-6 mb-12">
+      <div class="flex items-center gap-6 mb-6 lg:mb-12">
         <span aria-hidden="true"
           class="font-impact font-black text-zinc-900 leading-none select-none"
           style="font-size: clamp(72px, 14vw, 140px); letter-spacing: -0.04em; line-height: 0.8;">
           {numLabel}
         </span>
-        <div class="flex-1 h-[3px] bg-accent opacity-50"></div>
+        <div class="hidden lg:block flex-1 h-[3px] bg-accent opacity-50"></div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10 xl:gap-16 items-start">
